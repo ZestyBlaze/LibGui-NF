@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "package": "io.github.cottonmc.cotton.gui.impl.mixin.client",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  },
+  "client": [
+    "HandledScreenMixin",
+    "PressableWidgetAccessor",
+    "ScreenAccessor",
+    "SliderWidgetAccessor"
+  ]
+}
