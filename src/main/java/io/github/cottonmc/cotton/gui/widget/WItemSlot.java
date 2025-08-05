@@ -82,7 +82,7 @@ public class WItemSlot extends WWidget {
 	@Nullable
 	private Icon icon = null;
 	private boolean iconOnlyPaintedForEmptySlots = false;
-	private Container inventory;
+	private Container container;
 	private int startIndex = 0;
 	private int slotsWide = 1;
 	private int slotsHigh = 1;
@@ -131,78 +131,78 @@ public class WItemSlot extends WWidget {
 		}
 	};
 
-	public WItemSlot(Container inventory, int startIndex, int slotsWide, int slotsHigh, boolean big) {
+	public WItemSlot(Container container, int startIndex, int slotsWide, int slotsHigh, boolean big) {
 		this();
-		this.inventory = inventory;
+		this.container = container;
 		this.startIndex = startIndex;
 		this.slotsWide = slotsWide;
 		this.slotsHigh = slotsHigh;
 		this.big = big;
 		//this.ltr = ltr;
 	}
-	
+
 	private WItemSlot() {
 		hoveredProperty().addListener((property, from, to) -> {
 			assert to != null;
 			if (!to) hoveredSlot = -1;
 		});
 	}
-	
-	public static WItemSlot of(Container inventory, int index) {
+
+	public static WItemSlot of(Container container, int index) {
 		WItemSlot w = new WItemSlot();
-		w.inventory = inventory;
+		w.container = container;
 		w.startIndex = index;
-		
+
 		return w;
 	}
-	
-	public static WItemSlot of(Container inventory, int startIndex, int slotsWide, int slotsHigh) {
+
+	public static WItemSlot of(Container container, int startIndex, int slotsWide, int slotsHigh) {
 		WItemSlot w = new WItemSlot();
-		w.inventory = inventory;
+		w.container = container;
 		w.startIndex = startIndex;
 		w.slotsWide = slotsWide;
 		w.slotsHigh = slotsHigh;
-		
+
 		return w;
 	}
-	
+
 	public static WItemSlot outputOf(Container inventory, int index) {
 		WItemSlot w = new WItemSlot();
-		w.inventory = inventory;
+		w.container = inventory;
 		w.startIndex = index;
 		w.big = true;
-		
+
 		return w;
 	}
 
 	/**
 	 * Creates a 9x3 slot widget from the "main" part of a player inventory.
 	 *
-	 * @param inventory the player inventory
+	 * @param container the player inventory
 	 * @return the created slot widget
 	 * @see WPlayerInvPanel
 	 */
-	public static WItemSlot ofPlayerStorage(Container inventory) {
+	public static WItemSlot ofPlayerStorage(Container container) {
 		WItemSlot w = new WItemSlot() {
 			@Override
 			protected Component getNarrationName() {
-				return inventory instanceof Inventory inv ? inv.getDisplayName() : NarrationMessages.Vanilla.INVENTORY;
+				return container instanceof Inventory inv ? inv.getDisplayName() : NarrationMessages.Vanilla.INVENTORY;
 			}
 		};
-		w.inventory = inventory;
+		w.container = container;
 		w.startIndex = 9;
 		w.slotsWide = 9;
 		w.slotsHigh = 3;
 		//w.ltr = false;
-		
+
 		return w;
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return slotsWide * 18;
 	}
-	
+
 	@Override
 	public int getHeight() {
 		return slotsHigh * 18;
@@ -218,7 +218,7 @@ public class WItemSlot extends WWidget {
 	 * @since 11.1.0
 	 */
 	public Container getInventory() {
-		return inventory;
+		return container;
 	}
 
 	/**
@@ -391,11 +391,11 @@ public class WItemSlot extends WWidget {
 		super.validate(host);
 		peers.clear();
 		int index = startIndex;
-		
+
 		for (int y = 0; y < slotsHigh; y++) {
 			for (int x = 0; x < slotsWide; x++) {
 				// The Slot object is offset +1 because it's the inner area of the slot.
-				ValidatedSlot slot = createSlotPeer(inventory, index, this.getAbsoluteX() + (x * 18) + 1, this.getAbsoluteY() + (y * 18) + 1);
+				ValidatedSlot slot = createSlotPeer(container, index, this.getAbsoluteX() + (x * 18) + 1, this.getAbsoluteY() + (y * 18) + 1);
 				slot.setInsertingAllowed(insertingAllowed);
 				slot.setTakingAllowed(takingAllowed);
 				slot.setInputFilter(inputFilter);
@@ -426,15 +426,15 @@ public class WItemSlot extends WWidget {
 	/**
 	 * Creates a slot peer for this slot widget.
 	 *
-	 * @param inventory the slot inventory
+	 * @param container the slot inventory
 	 * @param index     the index in the inventory
 	 * @param x         the X coordinate
 	 * @param y         the Y coordinate
 	 * @return the created slot instance
 	 * @since 1.11.0
 	 */
-	protected ValidatedSlot createSlotPeer(Container inventory, int index, int x, int y) {
-		return new ValidatedSlot(inventory, index, x, y);
+	protected ValidatedSlot createSlotPeer(Container container, int index, int x, int y) {
+		return new ValidatedSlot(container, index, x, y);
 	}
 
 	/**
@@ -532,7 +532,7 @@ public class WItemSlot extends WWidget {
 			backgroundPainter.paintBackground(context, x, y, this);
 		}
 
-		if (icon != null && (!iconOnlyPaintedForEmptySlots || inventory.getItem(startIndex).isEmpty())) {
+		if (icon != null && (!iconOnlyPaintedForEmptySlots || container.getItem(startIndex).isEmpty())) {
 			icon.paint(context, x + 1, y + 1, 16);
 		}
 	}

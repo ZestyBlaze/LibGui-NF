@@ -33,30 +33,30 @@ public class ValidatedSlot extends Slot {
 		if (inventory==null) throw new IllegalArgumentException("Can't make an itemslot from a null inventory!");
 		this.slotNumber = index;
 	}
-	
+
 	@Override
 	public boolean mayPlace(ItemStack stack) {
 		return insertingAllowed && container.canPlaceItem(slotNumber, stack) && inputFilter.test(stack);
 	}
-	
+
 	@Override
 	public boolean mayPickup(Player player) {
 		return takingAllowed && container.stillValid(player) && outputFilter.test(getItem());
 	}
-	
+
 	@Override
 	public ItemStack getItem() {
 		if (container==null) {
 			LOGGER.warn("Prevented null-inventory from WItemSlot with slot #: {}", slotNumber);
 			return ItemStack.EMPTY;
 		}
-		
+
 		ItemStack result = super.getItem();
 		if (result==null) {
 			LOGGER.warn("Prevented null-itemstack crash from: {}", container.getClass().getCanonicalName());
 			return ItemStack.EMPTY;
 		}
-		
+
 		return result;
 	}
 

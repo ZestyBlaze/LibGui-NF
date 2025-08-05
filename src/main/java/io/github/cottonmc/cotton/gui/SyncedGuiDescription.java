@@ -31,7 +31,7 @@ import java.util.function.Supplier;
  * A screen handler-based GUI description for GUIs with slots.
  */
 public class SyncedGuiDescription extends AbstractContainerMenu implements GuiDescription {
-	protected Inventory blockInventory;
+	protected Container blockInventory;
 	protected Inventory playerInventory;
 	protected Level world;
 	protected ContainerData propertyDelegate;
@@ -70,7 +70,7 @@ public class SyncedGuiDescription extends AbstractContainerMenu implements GuiDe
 	 * @param blockInventory   the block inventory of a corresponding container block, or null if not found or applicable
 	 * @param propertyDelegate a property delegate whose properties, if any, will automatically be {@linkplain #addDataSlots(ContainerData)} added
 	 */
-	public SyncedGuiDescription(MenuType<?> type, int syncId, Inventory playerInventory, @Nullable Inventory blockInventory, @Nullable ContainerData propertyDelegate) {
+	public SyncedGuiDescription(MenuType<?> type, int syncId, Inventory playerInventory, @Nullable Container blockInventory, @Nullable ContainerData propertyDelegate) {
 		super(type, syncId);
 		this.blockInventory = blockInventory;
 		this.playerInventory = playerInventory;
@@ -190,7 +190,7 @@ public class SyncedGuiDescription extends AbstractContainerMenu implements GuiDe
 		return false;
 	}
 
-	private boolean insertItem(ItemStack toInsert, Inventory inventory, boolean walkBackwards, Player player) {
+	private boolean insertItem(ItemStack toInsert, Container inventory, boolean walkBackwards, Player player) {
 		//Make a unified list of slots *only from this inventory*
 		ArrayList<Slot> inventorySlots = new ArrayList<>();
 		for(Slot slot : slots) {
@@ -236,7 +236,7 @@ public class SyncedGuiDescription extends AbstractContainerMenu implements GuiDe
 		return inserted;
 	}
 
-	private boolean swapHotbar(ItemStack toInsert, int slotNumber, Inventory inventory, Player player) {
+	private boolean swapHotbar(ItemStack toInsert, int slotNumber, Container inventory, Player player) {
 		//Feel out the slots to see what's storage versus hotbar
 		ArrayList<Slot> storageSlots = new ArrayList<>();
 		ArrayList<Slot> hotbarSlots = new ArrayList<>();
