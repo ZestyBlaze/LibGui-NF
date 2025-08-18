@@ -86,7 +86,7 @@ public interface BackgroundPainter {
 	 *
 	 * @param panelColor the panel background color
 	 * @return a colorful gui panel painter
-	 * @see ScreenDrawing#drawGuiPanel(GuiGraphics, int, int, int, int, int)
+	 * @see ScreenDrawing#drawGuiPanel(DrawContext, int, int, int, int, int)
 	 */
 	public static BackgroundPainter createColorful(int panelColor) {
 		return (context, left, top, panel) -> {
@@ -105,7 +105,7 @@ public interface BackgroundPainter {
 		return (context, left, top, panel) -> {
 			int shadowColor = ScreenDrawing.multiplyColor(panelColor, 1.0f - contrast);
 			int hilightColor = ScreenDrawing.multiplyColor(panelColor, 1.0f + contrast);
-			
+
 			ScreenDrawing.drawGuiPanel(context, left, top, panel.getWidth(), panel.getHeight(), shadowColor, panelColor, hilightColor, 0xFF000000);
 		};
 	}

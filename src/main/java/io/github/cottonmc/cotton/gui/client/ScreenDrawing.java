@@ -27,7 +27,7 @@ public class ScreenDrawing {
 	 * @param y       the y coordinate of the box on-screen
 	 * @param width   the width of the box on-screen
 	 * @param height  the height of the box on-screen
-	 * @param texture the ResourceLocation for the texture
+	 * @param texture the net.minecraft.resources.ResourceLocation for the texture
 	 * @param color   a color to tint the texture. This can be transparent! Use 0xFF_FFFFFF if you don't want a color tint
 	 */
 	public static void texturedRect(GuiGraphics context, int x, int y, int width, int height, ResourceLocation texture, int color) {
@@ -106,9 +106,16 @@ public class ScreenDrawing {
 
 			// GUI sprites: Work more carefully as we need to support tiling/nine-slice
 			case GUI_SPRITE -> {
+				float r = (color >> 16 & 255) / 255.0F;
+				float g = (color >> 8 & 255) / 255.0F;
+				float b = (color & 255) / 255.0F;
+				float a = (color >> 24 & 255) / 255.0F;
+				RenderSystem.enableBlend();
+				RenderSystem.setShaderColor(r, g, b, opacity * a);
+
 				outer: if (texture.u1() == 0 && texture.u2() == 1 && texture.v1() == 0 && texture.v2() == 1) {
 					// If we're drawing the full texture, just let vanilla do it.
-					context.blitSprite(texture.image(), x, y, width, height, color);
+					context.blitSprite(texture.image(), x, y, width, height);
 				} else {
 					// If we're only drawing a region, draw the full texture in a larger size and clip it
 					// to only show the requested region.
@@ -124,19 +131,24 @@ public class ScreenDrawing {
 
 					PoseStack matrices = context.pose();
 					matrices.pushPose();
-					context.enableScissor(x, y, x + width, y + height);
 					matrices.translate(xo, yo, 0);
 
 					// Note: scale instead of drawing a (fullWidth, fullHeight) rectangle so that edges of nine-slice
 					// rectangles etc. are drawn scaled too. This matches the behavior of standalone textures.
 					matrices.scale(fullWidth / width, fullHeight / height, 1);
 
-					// Draw the texture using vanilla code.
-					context.blitSprite(texture.image(), 0, 0, width, height, color);
+					// Clip to the wanted area on the screen...
+					try (var frame = Scissors.push(x, y, width, height)) {
+						// ...and draw the texture.
+						context.blitSprite(texture.image(), 0, 0, width, height);
+					}
 
-					context.disableScissor();
 					matrices.popPose();
 				}
+
+				RenderSystem.disableBlend();
+				// Don't let the color cause tinting to other draw calls.
+				RenderSystem.setShaderColor(1, 1, 1, 1);
 			}
 		}
 	}
@@ -149,7 +161,7 @@ public class ScreenDrawing {
 	 * @param y       the y coordinate of the box on-screen
 	 * @param width   the width of the box on-screen
 	 * @param height  the height of the box on-screen
-	 * @param texture the Identifier for the texture
+	 * @param texture the ResourceLocation for the texture
 	 * @param u1      the left edge of the texture
 	 * @param v1      the top edge of the texture
 	 * @param u2      the right edge of the texture
@@ -523,9 +535,9 @@ public class ScreenDrawing {
 		int ib = (int)(b*255);
 
 		return
-				 a |
-				(ir << 16) |
-				(ig <<  8) |
-				 ib;
+				a |
+						(ir << 16) |
+						(ig <<  8) |
+						ib;
 	}
 }
